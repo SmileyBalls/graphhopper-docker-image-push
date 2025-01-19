@@ -9,6 +9,9 @@ RUN mvn clean install -DskipTests
 
 FROM eclipse-temurin:21.0.1_12-jre
 
+# Install dos2unix to handle line endings
+RUN apt-get update && apt-get install -y dos2unix curl
+
 ENV JAVA_OPTS="-Xmx16g -Xms16g"
 
 RUN mkdir -p /data
@@ -18,9 +21,11 @@ WORKDIR /graphhopper
 # Copy built jar file
 COPY --from=build /graphhopper/web/target/graphhopper*.jar ./
 
-# Download config file from GraphHopper repository
+
+# Download config file and shell script, fix line endings
 RUN curl -L https://raw.githubusercontent.com/graphhopper/graphhopper/master/config-example.yml -o config-example.yml \
     && curl -L https://raw.githubusercontent.com/graphhopper/graphhopper/master/graphhopper.sh -o graphhopper.sh \
+    && dos2unix graphhopper.sh \
     && chmod +x graphhopper.sh
 
 # Enable connections from outside of the container
