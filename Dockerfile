@@ -21,12 +21,7 @@ WORKDIR /graphhopper
 # Copy built jar file
 COPY --from=build /graphhopper/web/target/graphhopper*.jar ./
 
-
-# Download config file and shell script, fix line endings
-RUN curl -L https://raw.githubusercontent.com/graphhopper/graphhopper/master/config-example.yml -o config-example.yml \
-    && curl -L https://raw.githubusercontent.com/graphhopper/graphhopper/master/graphhopper.sh -o graphhopper.sh \
-    && dos2unix graphhopper.sh \
-    && chmod +x graphhopper.sh
+COPY graphhopper.sh graphhopper/config-example.yml ./
 
 # Enable connections from outside of the container
 RUN sed -i '/^ *bind_host/s/^ */&# /p' config-example.yml
